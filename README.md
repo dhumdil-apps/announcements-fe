@@ -90,8 +90,20 @@ src/
 
 ## Data
 
-- Mock data for now (API integration planned)
+- Connected to backend REST API at `http://localhost:3000/api`
 - See [API.md](./API.md) for backend API specification
+
+## API Integration
+
+```
+src/
+  api/
+    client.ts           # Generic fetch wrapper
+    announcements.ts    # Announcements API functions
+    categories.ts       # Categories API functions
+```
+
+Routes use TanStack Router loaders to fetch data from the API before rendering.
 
 ## Scripts
 
@@ -102,3 +114,17 @@ src/
 - `npm run format` - Format code with Prettier
 - `npm run format:check` - Check code formatting
 - `npm run check` - Run tsc, ESLint, and Prettier checks
+
+## Running with Backend
+
+```bash
+# Terminal 1 - Start backend (port 3000)
+cd announcements-be
+npm run start:dev
+
+# Terminal 2 - Start frontend (port 5173)
+cd announcements-fe
+npm run dev
+```
+
+The frontend connects to the backend API at `http://localhost:3000/api`.

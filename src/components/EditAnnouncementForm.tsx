@@ -1,11 +1,40 @@
 import { useForm } from "@tanstack/react-form";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouter } from "@tanstack/react-router";
 import Select from "react-select";
-import type { Announcement } from "../data/types";
-import { categories, announcements } from "../data/mockData";
+import type { Announcement, Category } from "../data/types";
+import { announcementsApi } from "../api/announcements";
 
 interface EditAnnouncementFormProps {
   announcement?: Announcement;
+  categories: Category[];
+}
+
+// Convert ISO date string to display format (MM/DD/YYYY HH:mm)
+function isoToDisplayDate(isoDate: string): string {
+  if (!isoDate) return "";
+  const date = new Date(isoDate);
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const year = date.getFullYear();
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${month}/${day}/${year} ${hours}:${minutes}`;
+}
+
+// Convert display format (MM/DD/YYYY HH:mm) to ISO date string
+function displayToIsoDate(displayDate: string): string {
+  const match = displayDate.match(
+    /^(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})$/,
+  );
+  if (!match) return displayDate;
+  const [, month, day, year, hours, minutes] = match;
+  return new Date(
+    Number(year),
+    Number(month) - 1,
+    Number(day),
+    Number(hours),
+    Number(minutes),
+  ).toISOString();
 }
 
 const DATE_REGEX =
@@ -13,8 +42,10 @@ const DATE_REGEX =
 
 export function EditAnnouncementForm({
   announcement,
+  categories,
 }: EditAnnouncementFormProps) {
   const navigate = useNavigate();
+  const router = useRouter();
   const isEditing = !!announcement;
 
   const form = useForm({
@@ -22,7 +53,9 @@ export function EditAnnouncementForm({
       title: announcement?.title ?? "",
       content: announcement?.content ?? "",
       categories: announcement?.categories ?? [],
-      publicationDate: announcement?.publicationDate ?? "",
+      publicationDate: announcement?.publicationDate
+        ? isoToDisplayDate(announcement.publicationDate)
+        : "",
     },
     onSubmit: async ({ value }) => {
       const errors: string[] = [];
@@ -47,49 +80,30 @@ export function EditAnnouncementForm({
         return;
       }
 
-      const now = new Date()
-        .toLocaleString("en-US", {
-          month: "2-digit",
-          day: "2-digit",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-        })
-        .replace(",", "");
+      const payload = {
+        title: value.title,
+        content: value.content,
+        categories: value.categories,
+        publicationDate: displayToIsoDate(value.publicationDate),
+      };
 
       if (isEditing) {
-        // Update existing announcement
-        const index = announcements.findIndex((a) => a.id === announcement.id);
-        if (index !== -1) {
-          announcements[index] = {
-            ...announcements[index],
-            ...value,
-            lastUpdate: now,
-          };
-        }
+        await announcementsApi.update(announcement.id, payload);
       } else {
-        // Create new announcement
-        const newAnnouncement: Announcement = {
-          id: crypto.randomUUID(),
-          ...value,
-          lastUpdate: now,
-        };
-        announcements.push(newAnnouncement);
+        await announcementsApi.create(payload);
       }
 
+      await router.invalidate();
       navigate({ to: "/announcements" });
     },
   });
 
-  const handleRemove = () => {
+  const handleRemove = async () => {
     if (!announcement) return;
     if (!confirm("Are you sure you want to remove this announcement?")) return;
 
-    const index = announcements.findIndex((a) => a.id === announcement.id);
-    if (index !== -1) {
-      announcements.splice(index, 1);
-    }
+    await announcementsApi.delete(announcement.id);
+    await router.invalidate();
     navigate({ to: "/announcements" });
   };
 

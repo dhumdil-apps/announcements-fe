@@ -1,13 +1,23 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { AnnouncementsTable } from "../../components/AnnouncementsTable";
-import { announcements, categories } from "../../data/mockData";
+import { announcementsApi } from "../../api/announcements";
+import { categoriesApi } from "../../api/categories";
 
 export const Route = createFileRoute("/announcements/")({
+  loader: async () => {
+    const [announcements, categories] = await Promise.all([
+      announcementsApi.getAll(),
+      categoriesApi.getAll(),
+    ]);
+    return { announcements, categories };
+  },
   component: AnnouncementsPage,
 });
 
 function AnnouncementsPage() {
+  const { announcements, categories } = Route.useLoaderData();
+
   return (
     <div>
       <h1 className="mb-6 text-2xl font-bold">Announcements</h1>
