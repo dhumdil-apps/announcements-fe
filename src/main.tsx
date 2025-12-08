@@ -1,8 +1,19 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
+import { RouterProvider, createRouter } from "@tanstack/react-router";
+
+import { routeTree } from "./routeTree.gen";
+
 import "./index.css";
 
-// Render the app
+const router = createRouter({ routeTree });
+
+declare module "@tanstack/react-router" {
+  interface Register {
+    router: typeof router;
+  }
+}
+
 const rootElement = document.getElementById("root")!;
 
 if (!rootElement.innerHTML) {
@@ -10,7 +21,7 @@ if (!rootElement.innerHTML) {
 
   root.render(
     <StrictMode>
-      <h1 className="text-3xl font-bold text-blue-500">Announcements</h1>
+      <RouterProvider router={router} />
     </StrictMode>,
   );
 }
