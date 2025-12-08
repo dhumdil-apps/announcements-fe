@@ -5,7 +5,7 @@ import type { Announcement } from "../data/types";
 import { categories, announcements } from "../data/mockData";
 
 interface EditAnnouncementFormProps {
-  announcement: Announcement;
+  announcement?: Announcement;
 }
 
 const DATE_REGEX =
@@ -15,13 +15,14 @@ export function EditAnnouncementForm({
   announcement,
 }: EditAnnouncementFormProps) {
   const navigate = useNavigate();
+  const isEditing = !!announcement;
 
   const form = useForm({
     defaultValues: {
-      title: announcement.title,
-      content: announcement.content,
-      categories: announcement.categories,
-      publicationDate: announcement.publicationDate,
+      title: announcement?.title ?? "",
+      content: announcement?.content ?? "",
+      categories: announcement?.categories ?? [],
+      publicationDate: announcement?.publicationDate ?? "",
     },
     onSubmit: async ({ value }) => {
       const errors: string[] = [];
@@ -46,28 +47,51 @@ export function EditAnnouncementForm({
         return;
       }
 
-      // Update mock data
-      const index = announcements.findIndex((a) => a.id === announcement.id);
-      if (index !== -1) {
-        announcements[index] = {
-          ...announcements[index],
+      const now = new Date()
+        .toLocaleString("en-US", {
+          month: "2-digit",
+          day: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        })
+        .replace(",", "");
+
+      if (isEditing) {
+        // Update existing announcement
+        const index = announcements.findIndex((a) => a.id === announcement.id);
+        if (index !== -1) {
+          announcements[index] = {
+            ...announcements[index],
+            ...value,
+            lastUpdate: now,
+          };
+        }
+      } else {
+        // Create new announcement
+        const newAnnouncement: Announcement = {
+          id: crypto.randomUUID(),
           ...value,
-          lastUpdate: new Date()
-            .toLocaleString("en-US", {
-              month: "2-digit",
-              day: "2-digit",
-              year: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
-            })
-            .replace(",", ""),
+          lastUpdate: now,
         };
+        announcements.push(newAnnouncement);
       }
 
       navigate({ to: "/announcements" });
     },
   });
+
+  const handleRemove = () => {
+    if (!announcement) return;
+    if (!confirm("Are you sure you want to remove this announcement?")) return;
+
+    const index = announcements.findIndex((a) => a.id === announcement.id);
+    if (index !== -1) {
+      announcements.splice(index, 1);
+    }
+    navigate({ to: "/announcements" });
+  };
 
   return (
     <form
@@ -164,18 +188,28 @@ export function EditAnnouncementForm({
       </form.Field>
 
       <div className="flex gap-4">
-        <button
-          type="submit"
-          className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
-        >
-          Publish
-        </button>
+        {isEditing && (
+          <button
+            type="button"
+            onClick={handleRemove}
+            className="cursor-pointer rounded-md bg-white px-4 py-2 text-gray-700 transition-all duration-200 hover:bg-red-500 hover:text-white focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none"
+          >
+            Remove
+          </button>
+        )}
+
         <button
           type="button"
           onClick={() => navigate({ to: "/announcements" })}
-          className="rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
+          className="ml-auto cursor-pointer rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
         >
           Cancel
+        </button>
+        <button
+          type="submit"
+          className="cursor-pointer rounded-md bg-yellow-400 px-4 py-2 font-bold text-black hover:bg-yellow-300 focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 focus:outline-none"
+        >
+          Publish
         </button>
       </div>
     </form>

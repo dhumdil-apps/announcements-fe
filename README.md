@@ -1,6 +1,6 @@
 # Announcements Frontend
 
-A React + TypeScript + Vite application with Tailwind CSS.
+A web application for managing city announcements
 
 ## Tech Stack
 
@@ -12,12 +12,11 @@ A React + TypeScript + Vite application with Tailwind CSS.
 
 ## Routes
 
+### `/` - Redirects to `/announcements`.
+
 ### `/announcements` - Announcements List
 
-Layout:
-
-- **Sidebar**: City logo, title, and navigation with "Announcements" link (navigates to `/announcements`)
-- **Main content**: Table displaying announcements with title "Announcements"
+- Floating action button (FAB) at bottom-right to create a new announcement
 
 #### Announcements Table
 
@@ -28,6 +27,7 @@ Responsive design:
 
 Features:
 
+- **Search**: Text input to filter announcements by title
 - **Sort toggle**: Click to toggle publication date sort order (ascending/descending, default: descending)
 - **Category filter**: Click category pills to filter announcements (multi-select, shows announcements matching any selected category)
 
@@ -39,11 +39,15 @@ Features:
 | Categories       | One or more categories (at least one required)                                   |
 | (actions)        | Icon link to edit page (`/announcements/:id`) - opens the announcement edit form |
 
+### `/announcements/new` - New Announcement
+
+Create a new announcement using the same form as edit.
+
 ### `/announcements/:id` - Edit Announcement
 
-Edit existing announcement only (no create functionality in MVP).
+Edit an existing announcement.
 
-Form fields:
+Form fields (shared by new and edit):
 
 - **Title**: Text input
 - **Content**: Textarea
@@ -54,10 +58,12 @@ All fields are required.
 
 Behavior:
 
-- Form is pre-filled with current announcement values
-- On submit (Publish button): validates all fields are filled
+- Edit mode: Form is pre-filled with current announcement values
+- New mode: Form starts empty
+- On submit (Publish button, yellow): validates all fields are filled
   - If validation fails: shows alert with error message
-  - If validation passes: saves announcement and redirects to `/announcements`
+  - If validation passes: saves/creates announcement and redirects to `/announcements`
+- Remove button (red, edit mode only): deletes announcement after confirmation
 
 ## Project Structure
 
@@ -78,6 +84,7 @@ src/
     index.tsx
     announcements/
       index.tsx     # List page
+      new.tsx       # New announcement page
       $id.tsx       # Edit page
 ```
 

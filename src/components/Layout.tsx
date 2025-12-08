@@ -7,7 +7,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       {/* Sidebar */}
       <aside className="flex w-16 flex-col bg-gray-800 text-white xl:w-64">
         <div className="flex items-center justify-center gap-3 border-b border-gray-700 p-4 xl:justify-start">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-blue-500 text-xl font-bold">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-yellow-500 text-xl font-bold text-black">
             T
           </div>
           <span className="hidden text-lg font-semibold xl:block">
