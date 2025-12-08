@@ -91,6 +91,7 @@ src/
 ## Data
 
 - Mock data for now (API integration planned)
+- See [API.md](./API.md) for backend API specification
 
 ## Scripts
 
