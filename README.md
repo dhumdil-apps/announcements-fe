@@ -15,11 +15,11 @@ A web application for managing city announcements
 
 Custom colors defined in `src/index.css`:
 
-| Color   | Value     | Usage                          |
-| ------- | --------- | ------------------------------ |
-| sidebar | `#fafafa` | Sidebar background             |
-| primary | `#ffb74a` | Buttons, logo, FAB             |
-| accent  | `#fff7d1` | Nav hover/active states        |
+| Color   | Value     | Usage                   |
+| ------- | --------- | ----------------------- |
+| sidebar | `#fafafa` | Sidebar background      |
+| primary | `#ffb74a` | Buttons, logo, FAB      |
+| accent  | `#fff7d1` | Nav hover/active states |
 
 ## Routes
 
@@ -186,12 +186,13 @@ Routes use TanStack Router loaders to fetch data from the API before rendering.
 
 The app connects to the backend via WebSocket (`ws://localhost:3000`) to receive real-time updates:
 
-| Event                  | Description                          |
-| ---------------------- | ------------------------------------ |
-| `announcement:created` | Shows notification for new announcement |
+| Event                  | Description                                 |
+| ---------------------- | ------------------------------------------- |
+| `announcement:created` | Shows notification for new announcement     |
 | `announcement:updated` | Shows notification for updated announcement |
 
 When an event is received:
+
 1. A native browser notification is shown (requires user permission)
 2. The router cache is invalidated to refresh the data
 
@@ -207,6 +208,17 @@ When the API is unavailable, the app automatically falls back to offline mode wi
 - An alert banner appears in the navigation showing a warning icon that reveals "Server is offline" on hover/focus
 
 Mock data state is managed in `src/api/mockDataState.ts` with a mutable in-memory store.
+
+## Environment Variables
+
+Copy `.env.example` to `.env` and configure:
+
+| Variable       | Description           | Default                     |
+| -------------- | --------------------- | --------------------------- |
+| `VITE_API_URL` | Backend REST API URL  | `http://localhost:3000/api` |
+| `VITE_WS_URL`  | Backend WebSocket URL | `ws://localhost:3000`       |
+
+For production deployment, set these variables in your hosting environment.
 
 ## Scripts
 

@@ -93,6 +93,7 @@ export function useAnnouncementsTable({
     ];
   }, [categories]);
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table is not fully compatible with React Compiler
   const table = useReactTable({
     data: sortedData,
     columns,

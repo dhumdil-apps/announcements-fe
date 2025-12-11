@@ -6,19 +6,19 @@ Base URL: `/api`
 
 ### Categories
 
-| Method | Endpoint      | Description          |
-| ------ | ------------- | -------------------- |
-| GET    | `/categories` | List all categories  |
+| Method | Endpoint      | Description         |
+| ------ | ------------- | ------------------- |
+| GET    | `/categories` | List all categories |
 
 ### Announcements
 
-| Method | Endpoint            | Description              |
-| ------ | ------------------- | ------------------------ |
-| GET    | `/announcements`    | List all announcements   |
-| GET    | `/announcements/:id`| Get single announcement  |
-| POST   | `/announcements`    | Create new announcement  |
-| PUT    | `/announcements/:id`| Update announcement      |
-| DELETE | `/announcements/:id`| Delete announcement      |
+| Method | Endpoint             | Description             |
+| ------ | -------------------- | ----------------------- |
+| GET    | `/announcements`     | List all announcements  |
+| GET    | `/announcements/:id` | Get single announcement |
+| POST   | `/announcements`     | Create new announcement |
+| PUT    | `/announcements/:id` | Update announcement     |
+| DELETE | `/announcements/:id` | Delete announcement     |
 
 ## Data Models
 
@@ -32,9 +32,9 @@ interface Announcement {
   id: string;
   title: string;
   content: string;
-  publicationDate: string;  // ISO 8601 format
-  lastUpdate: string;       // ISO 8601 format
-  categories: string[];     // Array of category IDs
+  publicationDate: string; // ISO 8601 format
+  lastUpdate: string; // ISO 8601 format
+  categories: string[]; // Array of category IDs
 }
 ```
 
@@ -79,6 +79,7 @@ GET /api/announcements?search=park&category=1
 ### POST /api/announcements
 
 Request:
+
 ```json
 {
   "title": "New Announcement",
@@ -89,6 +90,7 @@ Request:
 ```
 
 Response:
+
 ```json
 {
   "data": {
@@ -105,6 +107,7 @@ Response:
 ### PUT /api/announcements/:id
 
 Request:
+
 ```json
 {
   "title": "Updated Title",
@@ -129,8 +132,8 @@ Response: `204 No Content`
 }
 ```
 
-| Status | Code            | Description                    |
-| ------ | --------------- | ------------------------------ |
-| 400    | VALIDATION_ERROR| Invalid request body           |
-| 404    | NOT_FOUND       | Resource not found             |
-| 500    | INTERNAL_ERROR  | Server error                   |
+| Status | Code             | Description          |
+| ------ | ---------------- | -------------------- |
+| 400    | VALIDATION_ERROR | Invalid request body |
+| 404    | NOT_FOUND        | Resource not found   |
+| 500    | INTERNAL_ERROR   | Server error         |

@@ -1,7 +1,7 @@
 import { io, Socket } from "socket.io-client";
 import type { Announcement } from "@/data/types";
 
-const SOCKET_URL = "ws://localhost:3000";
+const SOCKET_URL = import.meta.env.VITE_WS_URL || "ws://localhost:3000";
 
 export interface AnnouncementCreatedEvent {
   type: "created";
