@@ -1,5 +1,7 @@
-import type { Announcement } from '../data/types';
-import { apiClient } from './client';
+import type { Announcement } from "@/data/types";
+import { apiClient } from "./client";
+import { announcements as mockAnnouncements } from "@/data/mockData";
+import { setUsingMockData } from "./mockDataState";
 
 interface AnnouncementsResponse {
   data: Announcement[];
@@ -25,22 +27,48 @@ interface UpdateAnnouncementData {
 
 export const announcementsApi = {
   getAll: async (): Promise<Announcement[]> => {
-    const response = await apiClient.get<AnnouncementsResponse>('/announcements');
-    return response.data;
+    try {
+      const response =
+        await apiClient.get<AnnouncementsResponse>("/announcements");
+      return response.data;
+    } catch {
+      setUsingMockData(true);
+      return mockAnnouncements;
+    }
   },
 
   getById: async (id: string): Promise<Announcement> => {
-    const response = await apiClient.get<AnnouncementResponse>(`/announcements/${id}`);
-    return response.data;
+    try {
+      const response = await apiClient.get<AnnouncementResponse>(
+        `/announcements/${id}`,
+      );
+      return response.data;
+    } catch {
+      setUsingMockData(true);
+      const announcement = mockAnnouncements.find((a) => a.id === id);
+      if (!announcement) {
+        throw new Error("Announcement not found");
+      }
+      return announcement;
+    }
   },
 
   create: async (data: CreateAnnouncementData): Promise<Announcement> => {
-    const response = await apiClient.post<AnnouncementResponse>('/announcements', data);
+    const response = await apiClient.post<AnnouncementResponse>(
+      "/announcements",
+      data,
+    );
     return response.data;
   },
 
-  update: async (id: string, data: UpdateAnnouncementData): Promise<Announcement> => {
-    const response = await apiClient.put<AnnouncementResponse>(`/announcements/${id}`, data);
+  update: async (
+    id: string,
+    data: UpdateAnnouncementData,
+  ): Promise<Announcement> => {
+    const response = await apiClient.put<AnnouncementResponse>(
+      `/announcements/${id}`,
+      data,
+    );
     return response.data;
   },
 

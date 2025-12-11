@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { Link } from "@tanstack/react-router";
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -8,7 +7,9 @@ import {
   type ColumnFiltersState,
 } from "@tanstack/react-table";
 import { Pencil } from "lucide-react";
-import type { Announcement, Category } from "../data/types";
+import type { Announcement, Category } from "@/data/types";
+import { Badge } from "@/components/atoms";
+import { Link } from "@/components/atoms";
 
 const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
   year: "numeric",
@@ -16,12 +17,7 @@ const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
   day: "2-digit",
   hour: "2-digit",
   minute: "2-digit",
-});
-
-const dateFormatter = new Intl.DateTimeFormat(undefined, {
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
+  hour12: false,
 });
 
 const columnHelper = createColumnHelper<Announcement>();
@@ -31,28 +27,19 @@ interface UseAnnouncementsTableProps {
   categories: Category[];
 }
 
-export type SortOrder = "asc" | "desc";
-
 export function useAnnouncementsTable({
   data,
   categories,
 }: UseAnnouncementsTableProps) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
 
   const sortedData = useMemo(() => {
     return [...data].sort((a, b) => {
-      const dateA = new Date(a.publicationDate);
-      const dateB = new Date(b.publicationDate);
-      return sortOrder === "desc"
-        ? dateB.getTime() - dateA.getTime()
-        : dateA.getTime() - dateB.getTime();
+      const dateA = new Date(a.lastUpdate);
+      const dateB = new Date(b.lastUpdate);
+      return dateB.getTime() - dateA.getTime();
     });
-  }, [data, sortOrder]);
-
-  const toggleSortOrder = () => {
-    setSortOrder((prev) => (prev === "desc" ? "asc" : "desc"));
-  };
+  }, [data]);
 
   const columns = useMemo(() => {
     return [
@@ -62,19 +49,35 @@ export function useAnnouncementsTable({
       }),
       columnHelper.accessor("publicationDate", {
         header: "Publication date",
-        cell: (info) => dateTimeFormatter.format(new Date(info.getValue())),
+        cell: (info) => {
+          const publicationDate = new Date(info.getValue());
+          const formattedDate = dateTimeFormatter.format(publicationDate);
+
+          return <span className="text-sm">{formattedDate}</span>;
+        },
       }),
       columnHelper.accessor("lastUpdate", {
         header: "Last Update",
-        cell: (info) => dateFormatter.format(new Date(info.getValue())),
+        cell: (info) => {
+          const lastUpdate = new Date(info.getValue());
+          const formattedDate = dateTimeFormatter.format(lastUpdate);
+
+          return <span className="text-sm">{formattedDate}</span>;
+        },
       }),
       columnHelper.accessor("categories", {
         header: "Categories",
         cell: (info) => {
           const cats = info.getValue();
-          return cats
-            .map((c) => categories.find((cat) => cat.value === c)?.label ?? c)
-            .join(", ");
+          return (
+            <div className="flex flex-wrap gap-1">
+              {cats.map((c) => (
+                <Badge key={c}>
+                  {categories.find((cat) => cat.value === c)?.label ?? c}
+                </Badge>
+              ))}
+            </div>
+          );
         },
         filterFn: (row, columnId, filterValue: string[]) => {
           if (!filterValue || filterValue.length === 0) return true;
@@ -88,9 +91,11 @@ export function useAnnouncementsTable({
           <Link
             to="/announcements/$id"
             params={{ id: info.row.original.id }}
-            className="text-blue-600 hover:text-blue-800"
+            variant="circle"
           >
-            <Pencil className="h-5 w-5" />
+            <div className="flex w-full justify-end">
+              <Pencil className="h-5 w-5" />
+            </div>
           </Link>
         ),
       }),
@@ -136,8 +141,6 @@ export function useAnnouncementsTable({
     categoryFilter,
     setCategoryFilter,
     categories,
-    sortOrder,
-    toggleSortOrder,
     searchQuery,
     setSearchQuery,
   };
