@@ -7,36 +7,37 @@ import { DesktopAnnouncementsTable } from "./DesktopAnnouncementsTable";
 interface AnnouncementsTableProps {
   data: Announcement[];
   categories: Category[];
+  selectedCategories: string[];
+  onCategoryChange: (values: string[]) => void;
+  searchQuery: string;
+  onSearchChange: (value: string) => void;
 }
 
 export function AnnouncementsTable({
   data,
   categories,
+  selectedCategories,
+  onCategoryChange,
+  searchQuery,
+  onSearchChange,
 }: AnnouncementsTableProps) {
-  const {
-    table,
-    categoryFilter,
-    setCategoryFilter,
-    searchQuery,
-    setSearchQuery,
-  } = useAnnouncementsTable({
+  const { table } = useAnnouncementsTable({
     data,
     categories,
   });
 
-  const hasFilters = searchQuery.length > 0 || categoryFilter.length > 0;
-  const isEmpty = data.length === 0;
-  const isFilteredEmpty =
-    !isEmpty && table.getRowModel().rows.length === 0 && hasFilters;
+  const hasFilters = searchQuery.length > 0 || selectedCategories.length > 0;
+  const isEmpty = data.length === 0 && !hasFilters;
+  const isFilteredEmpty = data.length === 0 && hasFilters;
 
   return (
     <div className="space-y-4">
       <AnnouncementsFilters
         categories={categories}
-        categoryFilter={categoryFilter}
-        setCategoryFilter={setCategoryFilter}
+        categoryFilter={selectedCategories}
+        setCategoryFilter={onCategoryChange}
         searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
+        setSearchQuery={onSearchChange}
       />
 
       <MobileAnnouncementsList

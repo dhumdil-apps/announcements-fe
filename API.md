@@ -42,7 +42,25 @@ interface Announcement {
 
 ### GET /api/announcements
 
-Response:
+#### Query Parameters
+
+| Parameter  | Type               | Description                                      |
+| ---------- | ------------------ | ------------------------------------------------ |
+| `category` | string or string[] | Filter by category ID(s). Multiple values use OR |
+| `search`   | string             | Case-insensitive search in title and content     |
+
+#### Examples
+
+```
+GET /api/announcements
+GET /api/announcements?category=1
+GET /api/announcements?category=1&category=5
+GET /api/announcements?search=library
+GET /api/announcements?search=park&category=1
+```
+
+#### Response
+
 ```json
 {
   "data": [

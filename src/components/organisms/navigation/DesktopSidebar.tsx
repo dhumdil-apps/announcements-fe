@@ -27,7 +27,7 @@ export function DesktopSidebar({
           </Link>
         ))}
 
-        <AlertBanner variant="desktop" />
+        <AlertBanner label="Offline - using mock data" variant="desktop" />
       </nav>
     </aside>
   );

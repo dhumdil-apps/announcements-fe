@@ -20,8 +20,8 @@ export function NotificationContainer({
         <Notification
           key={notification.id}
           id={notification.id}
-          title={notification.title}
           message={notification.message}
+          type={notification.type}
           onDismiss={onDismiss}
         />
       ))}

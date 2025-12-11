@@ -3,7 +3,6 @@ import { ConfirmModal } from "@/components/molecules";
 import { useAnnouncementForm } from "./useAnnouncementForm";
 import { AnnouncementFormFields } from "./AnnouncementFormFields";
 import { AnnouncementFormActions } from "./AnnouncementFormActions";
-import { NotificationContainer } from "@/components/organisms";
 
 interface AnnouncementEditProps {
   announcement?: Announcement;
@@ -14,23 +13,11 @@ export function AnnouncementEdit({
   announcement,
   categories,
 }: AnnouncementEditProps) {
-  const {
-    form,
-    isEditing,
-    handleRemove,
-    handleCancel,
-    confirmModalProps,
-    notifications,
-    dismissNotification,
-  } = useAnnouncementForm({ announcement });
+  const { form, isEditing, handleRemove, handleCancel, confirmModalProps } =
+    useAnnouncementForm({ announcement });
 
   return (
     <>
-      <NotificationContainer
-        notifications={notifications}
-        onDismiss={dismissNotification}
-      />
-
       <form
         onSubmit={(e) => {
           e.preventDefault();

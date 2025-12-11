@@ -1,10 +1,8 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
   createColumnHelper,
   getCoreRowModel,
-  getFilteredRowModel,
   useReactTable,
-  type ColumnFiltersState,
 } from "@tanstack/react-table";
 import { Pencil } from "lucide-react";
 import type { Announcement, Category } from "@/data/types";
@@ -31,8 +29,6 @@ export function useAnnouncementsTable({
   data,
   categories,
 }: UseAnnouncementsTableProps) {
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-
   const sortedData = useMemo(() => {
     return [...data].sort((a, b) => {
       const dateA = new Date(a.lastUpdate);
@@ -79,11 +75,6 @@ export function useAnnouncementsTable({
             </div>
           );
         },
-        filterFn: (row, columnId, filterValue: string[]) => {
-          if (!filterValue || filterValue.length === 0) return true;
-          const rowCategories = row.getValue<string[]>(columnId);
-          return filterValue.some((filter) => rowCategories.includes(filter));
-        },
       }),
       columnHelper.display({
         id: "link",
@@ -102,46 +93,13 @@ export function useAnnouncementsTable({
     ];
   }, [categories]);
 
-  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: sortedData,
     columns,
-    state: {
-      columnFilters,
-    },
-    onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
   });
-
-  const categoryFilter = (columnFilters.find((f) => f.id === "categories")
-    ?.value ?? []) as string[];
-
-  const setCategoryFilter = (values: string[]) => {
-    setColumnFilters((prev) => {
-      const other = prev.filter((f) => f.id !== "categories");
-      if (values.length === 0) return other;
-      return [...other, { id: "categories", value: values }];
-    });
-  };
-
-  const searchQuery = (columnFilters.find((f) => f.id === "title")?.value ??
-    "") as string;
-
-  const setSearchQuery = (value: string) => {
-    setColumnFilters((prev) => {
-      const other = prev.filter((f) => f.id !== "title");
-      if (!value) return other;
-      return [...other, { id: "title", value }];
-    });
-  };
 
   return {
     table,
-    categoryFilter,
-    setCategoryFilter,
-    categories,
-    searchQuery,
-    setSearchQuery,
   };
 }

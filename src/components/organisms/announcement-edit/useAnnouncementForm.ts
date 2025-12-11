@@ -2,7 +2,7 @@ import { useForm } from "@tanstack/react-form";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import type { Announcement } from "@/data/types";
 import { announcementsApi } from "@/api/announcements";
-import { useConfirm, useNotifications } from "@/hooks";
+import { useConfirm } from "@/hooks";
 import { isoToDisplayDate, displayToIsoDate } from "@/lib/dateUtils";
 
 interface UseAnnouncementFormProps {
@@ -15,7 +15,6 @@ export function useAnnouncementForm({
   const navigate = useNavigate();
   const router = useRouter();
   const { confirm, confirmModalProps } = useConfirm();
-  const { notifications, notify, dismissNotification } = useNotifications();
   const isEditing = !!announcement;
 
   const form = useForm({
@@ -35,19 +34,14 @@ export function useAnnouncementForm({
         publicationDate: displayToIsoDate(value.publicationDate),
       };
 
-      try {
-        if (isEditing) {
-          await announcementsApi.update(announcement.id, payload);
-        } else {
-          await announcementsApi.create(payload);
-        }
-
-        await router.invalidate();
-
-        navigate({ to: "/announcements" });
-      } catch (e) {
-        notify.error("Failed to save.", "Server is offline", e);
+      if (isEditing) {
+        await announcementsApi.update(announcement.id, payload);
+      } else {
+        await announcementsApi.create(payload);
       }
+
+      navigate({ to: "/announcements" });
+      router.invalidate();
     },
   });
 
@@ -62,13 +56,9 @@ export function useAnnouncementForm({
 
     if (!confirmed) return;
 
-    try {
-      await announcementsApi.delete(announcement.id);
-      await router.invalidate();
-      navigate({ to: "/announcements" });
-    } catch (e) {
-      notify.error("Failed to remove.", "Server is offline", e);
-    }
+    await announcementsApi.delete(announcement.id);
+    navigate({ to: "/announcements" });
+    router.invalidate();
   };
 
   const handleCancel = () => {
@@ -81,7 +71,5 @@ export function useAnnouncementForm({
     handleRemove,
     handleCancel,
     confirmModalProps,
-    notifications,
-    dismissNotification,
   };
 }

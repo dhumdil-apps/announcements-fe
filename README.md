@@ -9,6 +9,7 @@ A web application for managing city announcements
 - TanStack Router (file-based routing), Table, Form
 - react-select (multiple select)
 - lucide-react (icons)
+- socket.io-client (real-time updates)
 
 ## Theme Colors
 
@@ -37,9 +38,10 @@ Responsive design:
 
 Features:
 
-- **Search**: Text input to filter announcements by title
-- **Sort toggle**: Click to toggle publication date sort order (ascending/descending, default: descending)
-- **Category filter**: Click category pills to filter announcements (multi-select, shows announcements matching any selected category)
+- **Search**: Text input to search announcements by title and content (server-side, updates URL)
+- **Category filter**: Multi-select dropdown to filter announcements by category (server-side, updates URL)
+
+Both filters update the URL and can be combined (e.g., `/announcements?search=park&category=1&category=5`).
 
 | Column           | Description                                                                      |
 | ---------------- | -------------------------------------------------------------------------------- |
@@ -84,6 +86,7 @@ src/
     announcements.ts    # Announcements API functions
     categories.ts       # Categories API functions
     mockDataState.ts    # Mock data state management
+    socket.ts           # WebSocket client for real-time events
   components/           # Component library (Atomic Design)
     atoms/              # Basic building blocks
       Badge.tsx         # Category badge/pill
@@ -125,6 +128,7 @@ src/
     mockData.ts         # Mock data (fallback when API unavailable)
     types.ts            # TypeScript interfaces
   hooks/                # Custom hooks
+    useAnnouncementEvents.ts # WebSocket event handling
     useConfirm.ts       # Confirmation modal state
     useNotifications.ts # Toast notification state
   lib/                  # Utilities
@@ -166,9 +170,43 @@ Components are organized following [Atomic Design](https://bradfrost.com/blog/po
 
 Routes use TanStack Router loaders to fetch data from the API before rendering.
 
+### Endpoints
+
+- `GET /announcements` - Returns all announcements
+- `GET /announcements?search=library` - Search in title and content
+- `GET /announcements?category=1&category=5` - Filter by categories (OR logic)
+- `GET /announcements?search=park&category=1` - Combine search with category filter
+- `GET /announcements/:id` - Returns single announcement
+- `POST /announcements` - Create announcement
+- `PUT /announcements/:id` - Update announcement
+- `DELETE /announcements/:id` - Delete announcement
+- `GET /categories` - Returns all categories
+
+### Real-time Notifications
+
+The app connects to the backend via WebSocket (`ws://localhost:3000`) to receive real-time updates:
+
+| Event                  | Description                          |
+| ---------------------- | ------------------------------------ |
+| `announcement:created` | Shows notification for new announcement |
+| `announcement:updated` | Shows notification for updated announcement |
+
+When an event is received:
+1. A native browser notification is shown (requires user permission)
+2. The router cache is invalidated to refresh the data
+
+WebSocket client is in `src/api/socket.ts`, event handling in `src/hooks/useAnnouncementEvents.ts`.
+
 ### Offline Fallback
 
-When the API is unavailable, the app automatically falls back to mock data from `src/data/mockData.ts`. An alert banner appears in the navigation showing a warning icon that reveals "Server is offline" on hover/focus.
+When the API is unavailable, the app automatically falls back to offline mode with full CRUD functionality:
+
+- All API operations (list, get, create, update, delete) seamlessly fall back to mock data
+- Changes are persisted in memory during the session
+- Search and category filters work on mock data
+- An alert banner appears in the navigation showing a warning icon that reveals "Server is offline" on hover/focus
+
+Mock data state is managed in `src/api/mockDataState.ts` with a mutable in-memory store.
 
 ## Scripts
 
@@ -196,8 +234,7 @@ The frontend connects to the backend API at `http://localhost:3000/api`.
 
 ## TODOs:
 
-- [ ] Add Auth
-- [ ] Add support for multi-city
+- [ ] Add monitoring & analytics services
+- [ ] Add Auth & Admin dashboard
 - [ ] Add support for pagination
 - [ ] Add calendar view as alternative for table view
-- [ ] Add monitoring & analytics services

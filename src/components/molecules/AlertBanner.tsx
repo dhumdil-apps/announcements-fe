@@ -2,13 +2,14 @@ import { useState, useEffect } from "react";
 import { AlertTriangle } from "lucide-react";
 import { isUsingMockData, subscribe } from "@/api/mockDataState";
 import { cn } from "@/lib/utils";
+import { Button } from "../atoms";
 
 interface AlertBannerProps {
   variant: "mobile" | "desktop";
-  label?: string;
+  label: string;
 }
 
-export function AlertBanner({ variant, label = "Offline" }: AlertBannerProps) {
+export function AlertBanner({ variant, label }: AlertBannerProps) {
   const [usingMock, setUsingMock] = useState(isUsingMockData);
 
   useEffect(() => {
@@ -20,13 +21,11 @@ export function AlertBanner({ variant, label = "Offline" }: AlertBannerProps) {
   }
 
   return (
-    <button
-      type="button"
+    <Button
       className={cn(
         "bg-destructive text-destructive-foreground group flex items-center overflow-hidden rounded px-3 py-2 text-sm font-medium transition-all duration-300",
         variant === "desktop" && "mt-auto gap-2",
       )}
-      title={label}
     >
       <AlertTriangle className="h-5 w-5" />
       <span
@@ -37,6 +36,6 @@ export function AlertBanner({ variant, label = "Offline" }: AlertBannerProps) {
       >
         {label}
       </span>
-    </button>
+    </Button>
   );
 }

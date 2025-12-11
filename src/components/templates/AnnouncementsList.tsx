@@ -4,20 +4,33 @@ import { AnnouncementsTable } from "@/components/organisms";
 import { Link } from "@/components/atoms";
 
 export function AnnouncementsList({
-  title,
   announcements,
   categories,
+  selectedCategories,
+  onCategoryChange,
+  searchQuery,
+  onSearchChange,
 }: {
-  title: string;
   announcements: Announcement[];
   categories: Category[];
+  selectedCategories: string[];
+  onCategoryChange: (values: string[]) => void;
+  searchQuery: string;
+  onSearchChange: (value: string) => void;
 }) {
   return (
     <div>
-      <h1 className="py-6 text-2xl font-bold">{title}</h1>
+      <h1 className="py-6 text-2xl font-bold">Announcements</h1>
 
       <div className="pb-12">
-        <AnnouncementsTable data={announcements} categories={categories} />
+        <AnnouncementsTable
+          data={announcements}
+          categories={categories}
+          selectedCategories={selectedCategories}
+          onCategoryChange={onCategoryChange}
+          searchQuery={searchQuery}
+          onSearchChange={onSearchChange}
+        />
       </div>
 
       <div className="fixed right-4 bottom-4 text-black lg:right-13">

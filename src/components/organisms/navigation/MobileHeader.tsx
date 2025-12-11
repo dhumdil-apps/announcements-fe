@@ -20,7 +20,7 @@ export function MobileHeader({
       </div>
 
       <nav className="flex items-center gap-2">
-        <AlertBanner variant="mobile" />
+        <AlertBanner label="Offline" variant="mobile" />
         {navigation.map((item) => (
           <Link key={item.path as string} to={item.path} title={item.label}>
             {item.icon}

@@ -6,4 +6,4 @@ export { FormField } from "./FormField";
 export { Notification } from "./Notification";
 export { SearchBox } from "./SearchBox";
 
-export type { NotificationData } from "./Notification";
+export type { NotificationData, NotificationType } from "./Notification";

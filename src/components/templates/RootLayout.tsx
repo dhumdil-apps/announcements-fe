@@ -1,4 +1,5 @@
 import { MobileHeader, DesktopSidebar } from "@/components/organisms";
+import { useAnnouncementEvents } from "@/hooks";
 import type { NavigationItem } from "@/routes/__root";
 
 export function RootLayout({
@@ -10,6 +11,8 @@ export function RootLayout({
   navigation: NavigationItem[];
   children: React.ReactNode;
 }) {
+  useAnnouncementEvents();
+
   return (
     <div className="flex min-h-screen flex-col lg:flex-row">
       <MobileHeader title={title} navigation={navigation} />

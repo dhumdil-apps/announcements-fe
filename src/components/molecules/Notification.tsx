@@ -1,40 +1,46 @@
-import { useEffect } from "react";
-import { X, XCircle } from "lucide-react";
+import { X, Bell, Plus, Pencil, Trash2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-const DURATION = 5000;
+export type NotificationType = "info" | "created" | "updated" | "deleted";
 
 export interface NotificationData {
   id: string;
-  title: string;
   message: string;
+  type?: NotificationType;
 }
 
 interface NotificationProps extends NotificationData {
   onDismiss: (id: string) => void;
 }
 
+const icons: Record<NotificationType, typeof Bell> = {
+  info: Bell,
+  created: Plus,
+  updated: Pencil,
+  deleted: Trash2,
+};
+
 export function Notification({
   id,
-  title,
   message,
+  type = "info",
   onDismiss,
 }: NotificationProps) {
-  useEffect(() => {
-    const timer = setTimeout(() => onDismiss(id), DURATION);
-    return () => clearTimeout(timer);
-  }, [id, onDismiss]);
+  const Icon = icons[type];
 
   return (
     <div
       role="alert"
-      className="animate-slide-in-from-right bg-destructive text-destructive-foreground pointer-events-auto flex w-72 gap-3 rounded-lg p-4 shadow-lg"
+      className={cn(
+        "animate-slide-in-from-right pointer-events-auto flex w-72 gap-3 rounded-lg p-4 shadow-lg",
+        type === "deleted"
+          ? "bg-destructive text-destructive-foreground"
+          : "bg-primary text-primary-foreground",
+      )}
     >
-      <XCircle className="h-5 w-5 shrink-0" />
+      <Icon className="h-5 w-5 shrink-0" />
 
-      <div className="flex-1">
-        <h4 className="font-medium">{title}</h4>
-        <p className="mt-1 text-sm">{message}</p>
-      </div>
+      <p className="flex-1 text-sm">{message}</p>
 
       <button
         onClick={() => onDismiss(id)}

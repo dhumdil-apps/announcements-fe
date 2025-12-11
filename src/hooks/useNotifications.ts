@@ -1,5 +1,8 @@
 import { useState, useCallback } from "react";
-import type { NotificationData } from "@/components/molecules";
+import type {
+  NotificationData,
+  NotificationType,
+} from "@/components/molecules";
 
 type NotificationOptions = Omit<NotificationData, "id">;
 
@@ -17,13 +20,12 @@ export function useNotifications() {
   }, []);
 
   const notify = {
-    error: (message: string, title: string, details: unknown) => {
-      console.warn({
-        title,
-        message,
-        details,
-      }); // TODO: send errors to logging service
-      addNotification({ message, title });
+    show: (message: string, type?: NotificationType) => {
+      addNotification({ message, type });
+    },
+    error: (message: string, details?: unknown) => {
+      console.warn({ message, details }); // TODO: send errors to logging service
+      addNotification({ message, type: "deleted" });
     },
   };
 
