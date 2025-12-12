@@ -1,7 +1,22 @@
 import { io, Socket } from "socket.io-client";
 import type { Announcement } from "@/data/types";
 
-const SOCKET_URL = import.meta.env.VITE_WS_URL || "ws://localhost:3000";
+function getSocketUrl(): string {
+  const configuredUrl = import.meta.env.VITE_WS_URL;
+  if (configuredUrl) {
+    // Auto-upgrade ws:// to wss:// when page is loaded over HTTPS
+    if (
+      window.location.protocol === "https:" &&
+      configuredUrl.startsWith("ws://")
+    ) {
+      return configuredUrl.replace("ws://", "wss://");
+    }
+    return configuredUrl;
+  }
+  return "ws://localhost:3000";
+}
+
+const SOCKET_URL = getSocketUrl();
 
 export interface AnnouncementCreatedEvent {
   type: "created";
